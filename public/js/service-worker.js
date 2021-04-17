@@ -5,9 +5,9 @@ const FILES_TO_CACHE = [
     "/js/idb.js",
   ];
 
-const APP_PREFIX = 'BudgetTracker-';     
-const VERSION = 'version_01';
-const CACHE_NAME = APP_PREFIX + VERSION;
+  const CACHE_NAME = 'budget-tracker-cache-v1';
+  const DATA_CACHE_NAME = 'data-cache-v1';
+  
 
 self.addEventListener('install', function (e) {
     e.waitUntil(
@@ -15,28 +15,28 @@ self.addEventListener('install', function (e) {
         console.log('installing cache : ' + CACHE_NAME)
         return cache.addAll(FILES_TO_CACHE)
       })
-    )
+    );
+    self.skipWaiting();
 });
 
-self.addEventListener('activate', function(e) {
-    e.waitUntil(
-      caches.keys().then(function(keyList) {
-        let cacheKeeplist = keyList.filter(function(key) {
-          return key.indexOf(APP_PREFIX);
-        });
-        cacheKeeplist.push(CACHE_NAME);
-  
-        return Promise.all(
-          keyList.map(function(key, i) {
-            if (cacheKeeplist.indexOf(key) === -1) {
-              console.log('deleting cache : ' + keyList[i]);
-              return caches.delete(keyList[i]);
-            }
-          })
-        );
-      })
-    );
+// Activate the service worker and remove old data from the cache
+self.addEventListener('activate', function(evt) {
+  evt.waitUntil(
+    caches.keys().then(keyList => {
+      return Promise.all(
+        keyList.map(key => {
+          if (key !== CACHE_NAME && key !== DATA_CACHE_NAME) {
+            console.log('Removing old cache data', key);
+            return caches.delete(key);
+          }
+        })
+      );
+    })
+  );
+
+  self.clients.claim();
 });
+
 
 self.addEventListener('fetch', function (e) {
     console.log('fetch request : ' + e.request.url)
