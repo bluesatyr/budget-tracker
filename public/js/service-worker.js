@@ -1,8 +1,8 @@
 const FILES_TO_CACHE = [
-    "./index.html",
-    "./css/style.css",
-    "./index.js",
-    "./js/idb.js",
+    "/index.html",
+    "/css/style.css",
+    "/index.js",
+    "/js/idb.js",
   ];
 
 const APP_PREFIX = 'BudgetTracker-';     
